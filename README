@@ -1,0 +1,16 @@
+# 构建用于编译内核的镜像, 在当前目录下运行如下命令构建要使用的镜像
+* 不使用缓存`sudo docker build --force-rm --no-cache -t yuandot/compiler_rapi ./image`
+* 使用缓存`sudo docker build -t yuandot/compiler_rapi ./image`
+
+# 运行编译内核的容器, 在当前目录下执行如下命令
+```sudo docker run -it --rm --name compiler_rapi -e LOCAL_USER_ID=`id -u $USER` -v $PWD/linux:/workdir/linux yuandot/compiler_rapi```
+> --rm:容器退出后自动删除
+
+# 编译内核
+* 进入内核源码目录`cd linux`
+* 树莓派系统配置`make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- KERNEL=kernel7 bcm2709_defconfig`
+* 配置内核`make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- KERNEL=kernel7 menuconfig`
+* 编译内核镜像`make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- KERNEL=kernel7 -j1 zImage modules dtbs`
+> ARCH:表示处理器架构
+> CROSS_COMPILE:树莓派交叉编译工具
+> KERNEL:kernel7.img镜像使用的是armv7h,可以更好的发挥处理器性能;kernel.img也可以用,因为arm是向下兼容的。
